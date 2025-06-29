@@ -4,9 +4,11 @@ import { TbTrash } from 'react-icons/tb'
 
 const CtItems = () => {
 
+  const BASE_URL = import.meta.env.VITE_API_URL;
+
 
   const loadRazorpay = () => {
-  fetch("http://localhost:4000/createOrder", {
+  fetch(`${BASE_URL}/createOrder` , {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

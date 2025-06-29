@@ -1,6 +1,5 @@
 import { useRef, useEffect, useState, useContext } from "react";
 import { Link, NavLink } from "react-router-dom";
-import logo from "../assets/logo.svg"
 import logout from "../assets/logout.svg"
 import user from "../assets/user.svg"
 import Navbar from "./Navbar";

@@ -9,7 +9,13 @@ const path = require("path");
 const cors = require("cors");
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+   origin: [
+    "https://shopsmart-frontend.vercel.app",
+    "https://shopsmart-admin-woad.vercel.app"
+  ],
+  credentials: true
+}));
 
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log("MongoDB connected"))

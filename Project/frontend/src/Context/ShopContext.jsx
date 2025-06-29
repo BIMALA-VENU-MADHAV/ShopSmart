@@ -17,24 +17,28 @@ const ShopContextProvider = (props) => {
   const [all_products,setAll_products] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:4000/allproducts").then((response) => response.json()).then((data) => setAll_products(data));
-    if(localStorage.getItem('auth-token')){
-      fetch("http://localhost:4000/getcart" , {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'auth-token':`${localStorage.getItem('auth-token')}`,
-          'Content-Type':'application/json',
-        },
-        body:"",
-      }).then((response) => response.json()).then((data) => setCartItems(data));
-    }
-  },[])
-  
+  fetch(`${import.meta.env.VITE_API_URL}/allproducts`).then((response) => response.json()).then((data) => setAll_products(data));
+
+  if (localStorage.getItem('auth-token')) {
+    fetch(`${import.meta.env.VITE_API_URL}/getcart`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'auth-token': localStorage.getItem('auth-token'),
+        'Content-Type': 'application/json',
+      },
+      body: "", 
+    })
+      .then((response) => response.json())
+      .then((data) => setCartItems(data));
+  }
+}, []);
+
+
   const addToCart = (itemId) => {
     setCartItems((prev) => ({...prev,[itemId]:prev[itemId]+1}))
     if(localStorage.getItem('auth-token')){
-      fetch("http://localhost:4000/addtocart" , {
+      fetch(`${import.meta.env.VITE_API_URL}/addtocart` , {
         method: 'POST',
         headers: {
           Accept: 'application/json',
@@ -49,7 +53,7 @@ const ShopContextProvider = (props) => {
   const removeFromCart = (itemId) => {
     setCartItems((prev) => ({...prev,[itemId]:prev[itemId]-1}))
     if(localStorage.getItem('auth-token')){
-      fetch("http://localhost:4000/removefromcart" , {
+      fetch(`${import.meta.env.VITE_API_URL}/removefromcart` , {
         method: 'POST',
         headers: {
           Accept: 'application/json',
