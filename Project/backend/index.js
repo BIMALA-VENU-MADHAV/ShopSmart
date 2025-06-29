@@ -12,7 +12,9 @@ app.use(express.json());
 app.use(cors({
    origin: [
     "https://shopsmart-frontend.vercel.app",
-    "https://shopsmart-admin-woad.vercel.app"
+    "https://shopsmart-admin-woad.vercel.app",
+     "http://localhost:5173",
+       "http://localhost:5174"
   ],
   credentials: true
 }));
