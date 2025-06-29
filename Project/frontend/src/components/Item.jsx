@@ -16,8 +16,8 @@ const Item = ({ id, name, image, old_price, new_price }) => {
       <div className='p-4 overflow-hidden'>
         <h4 className='my-2 text-base font-medium line-clamp-2 text-gray-600'>{name}</h4>
         <div className='flex gap-5'>
-          <div className='text-lg font-bold text-black'>{new_price}.00</div>
-          <div className='text-secondary bold-16 line-through'>{old_price}.00</div>
+          <div className='text-lg font-bold text-black'>₹{new_price}.00</div>
+          <div className='text-secondary bold-16 line-through'>₹{old_price}.00</div>
         </div>
       </div>
     </div>

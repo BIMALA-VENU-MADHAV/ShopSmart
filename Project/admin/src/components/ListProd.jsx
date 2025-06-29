@@ -57,8 +57,8 @@ const ListProd = () => {
               <td>
                 <div className="line-clamp-3">{product.name}</div>
               </td>
-              <td>${product.old_price}</td>
-              <td>${product.new_price}</td>
+              <td>₹{product.old_price}</td>
+              <td>₹{product.new_price}</td>
               <td>{product.category}</td>
               <td>
                 <div className="font-bold pl-6 sm:pl-14 text-red-600 text-lg">
