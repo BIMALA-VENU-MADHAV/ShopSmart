@@ -1,11 +1,20 @@
 import Navbar from "./components/Navbar";
 import Admin from "./pages/Admin";
 
- export default function App() {
+export default function App() {
+
   return (
-       <main className="bg-primary text-tertiary">
-        <Navbar />
+
+    <main className="bg-primary text-tertiary min-h-screen">
+
+      <Navbar />
+
+      <div className="pt-20">
+
         <Admin />
-       </main>
-  )
+
+      </div>
+
+    </main>
+  );
 }

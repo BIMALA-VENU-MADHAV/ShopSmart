@@ -1,24 +1,49 @@
-import React from 'react'
-import POPULAR from '../assets/popular'
-import Item from './Item'
+import POPULAR from "../assets/popular";
+import Item from "./Item";
 
 const RelatedProducts = () => {
   return (
-     <section className='bg-primary'>
-      <div className='max_padd_container py-12 xl:w-[88%]'>
-        <h3 className='h3 text-center'>Related Products</h3>
-        <hr className='h-[3px] md:w-1/2 mx-auto bg-gradient-to-l from-transparent via-black to-transparent mb-16' />
+    <section className="bg-primary py-16 sm:py-20">
 
-        {/* container */}
-        <div className='grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6'>
-          {POPULAR.map((item) => (
-            <Item key={item.id} id={item.id} image={item.image} name={item.name}
-             new_price={item.new_price} old_price={item.old_price} />
-          ))}
+      <div className="max_padd_container">
+
+        {/* HEADING */}
+        <div className="text-center mb-12">
+
+          <span className="inline-block bg-secondary/10 text-secondary px-4 py-2 rounded-full text-sm font-semibold mb-4">
+            You May Like
+          </span>
+
+          <h2 className="text-[30px] sm:text-[42px] font-bold text-tertiary">
+            Related Products
+          </h2>
+
+          <p className="text-gray-600 mt-4 max-w-2xl mx-auto text-sm sm:text-base">
+            Explore more fresh grocery products carefully selected for you.
+          </p>
+
         </div>
-      </div>
-    </section>
-  )
-}
 
-export default RelatedProducts
+        {/* PRODUCTS */}
+        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-7">
+
+          {POPULAR.map((item) => (
+            <Item
+              key={item.id}
+              id={item.id}
+              image={item.image}
+              name={item.name}
+              new_price={item.new_price}
+              old_price={item.old_price}
+            />
+          ))}
+
+        </div>
+
+      </div>
+
+    </section>
+  );
+};
+
+export default RelatedProducts;

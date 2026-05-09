@@ -1,54 +1,150 @@
-import { useContext } from "react"
-import product_rt_1 from "../assets/product_rt_1.png"
-import product_rt_2 from "../assets/product_rt_2.png"
-import product_rt_3 from "../assets/product_rt_3.png"
-import product_rt_4 from "../assets/product_rt_4.png"
-import {MdStar} from "react-icons/md"
-import { ShopContext } from "../Context/ShopContext"
+import { useContext, useState } from "react";
+import { MdStar } from "react-icons/md";
 
-const ProductDisplay = (props) => {
+import product_rt_1 from "../assets/product_rt_1.png";
+import product_rt_2 from "../assets/product_rt_2.png";
+import product_rt_3 from "../assets/product_rt_3.png";
+import product_rt_4 from "../assets/product_rt_4.png";
 
-    const {product} = props;
-    const { addToCart } = useContext(ShopContext);
+import { ShopContext } from "../Context/ShopContext";
+
+const ProductDisplay = ({ product }) => {
+
+  const { addToCart } = useContext(ShopContext);
+
+  const productImages = [
+    product.image,
+    product_rt_1,
+    product_rt_2,
+    product_rt_3,
+    product_rt_4,
+  ];
+
+  const [mainImage, setMainImage] = useState(product.image);
 
   return (
-    <section>
-        <div className="flex flex-col gap-14 xl:flex-row">
-            <div className="flex gap-x-2 xl:flex-1">
-                <div className="flex flex-col gap-[7px] flex-wrap">
-                    <img src={product_rt_1} alt="prdctImg" className="max-h-[99px]" />
-                    <img src={product_rt_2} alt="prdctImg" className="max-h-[99px]" />
-                    <img src={product_rt_3} alt="prdctImg" className="max-h-[99px]" />
-                    <img src={product_rt_4} alt="prdctImg" className="max-h-[99px]" />
-                </div>
-                <div>
-                     <img src={product.image} alt="" />
-                </div>
-            </div>
-        <div className="flex-col flex xl:flex-[1.5]">
-            <h3 className="h3 ">{product.name}</h3>
-            <div className="flex gap-x-2 text-secondary medium-22">
-                <MdStar />
-                <MdStar />
-                <MdStar />
-                <MdStar />
-                <p>(111)</p>
-            </div>
-            <div className="flex gap-x-6 mediu,-20 my-4">
-                <div className="line-through">{product.old_price}</div>
-                <div className="text-secondary">{product.new_price}.00</div>
-            </div>
-            <div className="md-4">
-                <div  className="flex flex-col gap-y-3 md-4 max-w-[555px">
-                   <button onClick={() => {addToCart(product.id)}} className="btn_dark_outline !rounded-none uppercase regular-14 tracking-widest">Add to cart</button>
-                   <button className="btn_dark_rounded !rounded-none uppercase regular-14 tracking-widest">Buy now</button> 
-                </div>
-                <p><span className="medium-16 text-tertiary">Category :</span> Dairy Product | Cheese </p>
-            </div>
-        </div>
-        </div>
-    </section>
-  )
-}
+    <section className="py-6">
 
-export default ProductDisplay
+      <div className="flex flex-col xl:flex-row gap-12 xl:gap-16">
+
+        {/* LEFT */}
+        <div className="flex flex-col-reverse md:flex-row gap-4 flex-1">
+
+          {/* THUMBNAILS */}
+          <div className="flex md:flex-col gap-3 overflow-x-auto">
+
+            {productImages.map((img, index) => (
+              <div
+                key={index}
+                onClick={() => setMainImage(img)}
+                className={`border rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 min-w-[80px] ${
+                  mainImage === img
+                    ? "border-secondary"
+                    : "border-slate-200"
+                }`}
+              >
+
+                <img
+                  src={img}
+                  alt="productImg"
+                  className="w-20 h-20 object-cover"
+                />
+
+              </div>
+            ))}
+
+          </div>
+
+          {/* MAIN IMAGE */}
+          <div className="flex-1 bg-white rounded-[30px] p-4 shadow-md">
+
+            <img
+              src={mainImage}
+              alt={product.name}
+              className="w-full max-h-[550px] object-contain rounded-[20px]"
+            />
+
+          </div>
+
+        </div>
+
+        {/* RIGHT */}
+        <div className="flex-1">
+
+          <h1 className="text-[28px] sm:text-[38px] font-bold text-tertiary leading-tight">
+            {product.name}
+          </h1>
+
+          {/* RATING */}
+          <div className="flex items-center gap-3 mt-5">
+
+            <div className="flex items-center gap-1 text-secondary text-xl">
+              <MdStar />
+              <MdStar />
+              <MdStar />
+              <MdStar />
+              <MdStar />
+            </div>
+
+            <p className="text-gray-500 text-sm">
+              (111 Reviews)
+            </p>
+
+          </div>
+
+          {/* PRICE */}
+          <div className="flex items-center gap-5 mt-6">
+
+            <span className="text-gray-400 line-through text-lg">
+              ₹{product.old_price}
+            </span>
+
+            <span className="text-secondary text-[30px] font-bold">
+              ₹{product.new_price}
+            </span>
+
+          </div>
+
+          {/* DESCRIPTION */}
+          <p className="text-gray-600 mt-6 leading-7 text-sm sm:text-base">
+            ShopSmart delivers fresh and premium grocery essentials with fast delivery,
+            reliable quality, and a seamless shopping experience.
+          </p>
+
+          {/* BUTTONS */}
+          <div className="flex flex-col sm:flex-row gap-4 mt-8">
+
+            <button
+              onClick={() => addToCart(product.id)}
+              className="btn_dark_outline uppercase tracking-wider shadow-md hover:scale-105 transition-all duration-300"
+            >
+              Add To Cart
+            </button>
+
+            <button className="btn_secondary_rounded uppercase tracking-wider shadow-lg hover:scale-105 transition-all duration-300">
+              Buy Now
+            </button>
+
+          </div>
+
+          {/* CATEGORY */}
+          <div className="mt-8 border-t border-slate-200 pt-6">
+
+            <p className="text-gray-700 text-sm sm:text-base">
+              <span className="font-semibold text-tertiary">
+                Category :
+              </span>{" "}
+              {product.category}
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+  );
+};
+
+export default ProductDisplay;

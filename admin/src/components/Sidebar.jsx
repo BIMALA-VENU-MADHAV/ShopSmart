@@ -1,25 +1,67 @@
-import React from 'react';
-import listProduct from '../assets/productlist.png';
-import addProduct from '../assets/addproduct.png';
-import { Link } from 'react-router-dom';
+import listProduct from "../assets/productlist.png";
+import addProduct from "../assets/addproduct.png";
+
+import { NavLink } from "react-router-dom";
 
 const Sidebar = () => {
-  return (
-    <div className='py-7 flex justify-center gap-x-1 gap-y-5 w-full bg-white sm:gap-x-4 lg:flex-col lg:pt-20 lg:max-w-60 lg:h-screen lg:justify-start lg:pl-6'>
-      <Link to={'/addproduct'}>
-        <button className='flex items-center justify-center gap-2 rounded-md bg-primary h-14 w-40 xs:w-44 medium-16'>
-          <img src={addProduct} alt="" height={44} width={44} />
-          <span>Add Product</span>
-        </button>
-      </Link>
 
-      <Link to={'/listproduct'}>
-        <button className='flex items-center justify-center gap-2 rounded-md bg-primary h-14 w-40 xs:w-44 medium-16'>
-          <img src={listProduct} alt="" height={44} width={44} />
-          <span>Product List</span>
-        </button>
-      </Link>
-    </div>
+  return (
+
+    <aside className="bg-white lg:w-[270px] lg:min-h-[calc(100vh-80px)] shadow-md border-r border-slate-200">
+
+      <div className="flex lg:flex-col gap-4 p-4 lg:p-6 sticky top-20">
+
+        {/* ADD PRODUCT */}
+        <NavLink
+          to="/addproduct"
+          className={({ isActive }) =>
+            `flex items-center gap-4 rounded-2xl px-4 py-4 transition-all duration-300 ${
+              isActive
+                ? "bg-secondary text-white shadow-lg"
+                : "bg-primary hover:bg-secondary hover:text-white"
+            }`
+          }
+        >
+
+          <img
+            src={addProduct}
+            alt="addProduct"
+            className="w-10 h-10 object-contain"
+          />
+
+          <span className="font-semibold text-sm sm:text-base">
+            Add Product
+          </span>
+
+        </NavLink>
+
+        {/* PRODUCT LIST */}
+        <NavLink
+          to="/listproduct"
+          className={({ isActive }) =>
+            `flex items-center gap-4 rounded-2xl px-4 py-4 transition-all duration-300 ${
+              isActive
+                ? "bg-secondary text-white shadow-lg"
+                : "bg-primary hover:bg-secondary hover:text-white"
+            }`
+          }
+        >
+
+          <img
+            src={listProduct}
+            alt="productList"
+            className="w-10 h-10 object-contain"
+          />
+
+          <span className="font-semibold text-sm sm:text-base">
+            Product List
+          </span>
+
+        </NavLink>
+
+      </div>
+
+    </aside>
   );
 };
 

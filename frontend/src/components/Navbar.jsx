@@ -1,15 +1,56 @@
-import { NavLink } from "react-router-dom"
-import {MdCategory, MdContacts, MdHomeFilled, MdShop2} from "react-icons/md"
- 
+import { NavLink } from "react-router-dom";
+
+import {
+  MdHomeFilled,
+  MdLocalGroceryStore,
+  MdEco,
+  MdGrain,
+} from "react-icons/md";
+
 const Navbar = ({ containerStyles }) => {
+
+  const navLinkStyles = ({ isActive }) =>
+    isActive
+      ? "active_link flex items-center gap-x-2"
+      : "flex items-center gap-x-2 text-gray-700 hover:text-secondary transition-all duration-300";
+
   return (
     <nav className={containerStyles}>
-      <NavLink to={'/'} className={({isActive}) => isActive ? "active_link" : ""}> <div className="flexCenter gap-x-1"><MdHomeFilled />Home</div></NavLink>
-      <NavLink to={'/dairy'} className={({isActive}) => isActive ? "active_link" : ""}> <div className="flexCenter gap-x-1"><MdCategory />Dairy-Products</div></NavLink>
-      <NavLink to={'/vegetables'} className={({isActive}) => isActive ? "active_link" : ""}> <div className="flexCenter gap-x-1"><MdShop2 />Vegetables</div></NavLink>
-      <NavLink to={'/grains'} className={({isActive}) => isActive ? "active_link" : ""}> <div className="flexCenter gap-x-1"><MdContacts />Millets and Grains</div></NavLink>
-    </nav>
-  )
-}
 
-export default Navbar
+      <NavLink
+        to="/"
+        className={navLinkStyles}
+      >
+        <MdHomeFilled className="text-[20px]" />
+        <span>Home</span>
+      </NavLink>
+
+      <NavLink
+        to="/dairy"
+        className={navLinkStyles}
+      >
+        <MdLocalGroceryStore className="text-[20px]" />
+        <span>Dairy</span>
+      </NavLink>
+
+      <NavLink
+        to="/vegetables"
+        className={navLinkStyles}
+      >
+        <MdEco className="text-[20px]" />
+        <span>Vegetables</span>
+      </NavLink>
+
+      <NavLink
+        to="/grains"
+        className={navLinkStyles}
+      >
+        <MdGrain className="text-[20px]" />
+        <span>Grains</span>
+      </NavLink>
+
+    </nav>
+  );
+};
+
+export default Navbar;

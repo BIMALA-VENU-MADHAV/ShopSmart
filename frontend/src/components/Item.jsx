@@ -1,27 +1,95 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import { FaSearch } from 'react-icons/fa'
+import { Link } from "react-router-dom";
 
-const Item = ({ id, name, image, old_price, new_price }) => {
+import { FaSearch } from "react-icons/fa";
+
+import { BsCartPlus } from "react-icons/bs";
+
+import { useContext } from "react";
+
+import { ShopContext } from "../Context/ShopContext";
+
+const Item = ({
+  id,
+  name,
+  image,
+  old_price,
+  new_price,
+}) => {
+
+  const { addToCart } = useContext(ShopContext);
+
   return (
-    <div className='rounded-xl overflow-hidden shadow-lg'>
-      <div className='relative flex items-center justify-center group overflow-hidden transition-all duration-100'>
-        <Link to={`/product/${id}`} className='h-12 w-12 bg-white rounded-full flex items-center justify-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 py-2 z-20 scale-0 group-hover:scale-100 transition-all duration-700'>
-          <FaSearch className='hover:rotate-90 hover:scale-125 transition-all duration-200' />
+
+    <div className="group bg-white rounded-[24px] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500">
+
+      {/* IMAGE */}
+      <Link
+        to={`/product/${id}`}
+        onClick={() => window.scrollTo(0, 0)}
+        className="relative overflow-hidden block"
+      >
+
+        {/* SEARCH ICON */}
+        <div className="absolute z-20 top-4 right-4 bg-white w-11 h-11 rounded-full flexCenter shadow-lg opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500">
+
+          <FaSearch className="text-tertiary group-hover:text-secondary transition-all duration-300" />
+
+        </div>
+
+        <img
+          src={image}
+          alt={name}
+          className="w-full h-[220px] sm:h-[260px] object-cover group-hover:scale-110 transition-all duration-700"
+        />
+
+      </Link>
+
+      {/* CONTENT */}
+      <div className="p-4 sm:p-5">
+
+        {/* NAME */}
+        <Link
+          to={`/product/${id}`}
+          onClick={() => window.scrollTo(0, 0)}
+        >
+
+          <h4 className="text-[15px] sm:text-[17px] font-semibold text-tertiary line-clamp-2 min-h-[52px] hover:text-secondary transition-all duration-300">
+
+            {name}
+
+          </h4>
+
         </Link>
 
-        <img onClick={window.scrollTo(0,0)} src={image} alt='productImage' className='w-full block object-cover group-hover:scale-110 transition-all duration-1000' />
-      </div>
-    
-      <div className='p-4 overflow-hidden'>
-        <h4 className='my-2 text-base font-medium line-clamp-2 text-gray-600'>{name}</h4>
-        <div className='flex gap-5'>
-          <div className='text-lg font-bold text-black'>₹{new_price}.00</div>
-          <div className='text-secondary bold-16 line-through'>₹{old_price}.00</div>
-        </div>
-      </div>
-    </div>
-  )
-}
+        {/* PRICE */}
+        <div className="flex items-center gap-3 mt-4">
 
-export default Item
+          <span className="text-secondary text-[20px] font-bold">
+            ₹{new_price}
+          </span>
+
+          <span className="text-gray-400 line-through text-sm">
+            ₹{old_price}
+          </span>
+
+        </div>
+
+        {/* BUTTON */}
+        <button
+          onClick={() => addToCart(id)}
+          className="mt-5 w-full bg-tertiary hover:bg-secondary text-white py-3 rounded-xl font-medium flexCenter gap-2 transition-all duration-300"
+        >
+
+          <BsCartPlus className="text-lg" />
+
+          Add To Cart
+
+        </button>
+
+      </div>
+
+    </div>
+  );
+};
+
+export default Item;

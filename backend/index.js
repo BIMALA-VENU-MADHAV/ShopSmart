@@ -1,322 +1,593 @@
 require("dotenv").config();
-const port = 4000;
-const express = require("express");
-const app = express();
-const mongoose = require("mongoose");
-const jwt = require("jsonwebtoken");
-const multer = require("multer");
-const path = require("path");
-const cors = require("cors");
 
+const express=require("express");
+const mongoose=require("mongoose");
+const jwt=require("jsonwebtoken");
+const multer=require("multer");
+const cors=require("cors");
+const bcrypt=require("bcrypt");
+const Razorpay=require("razorpay");
+const cloudinary=require("cloudinary").v2;
+const {CloudinaryStorage}=require("multer-storage-cloudinary");
+
+const app=express();
+const port=process.env.PORT || 4000;
+
+/* MIDDLEWARE */
 app.use(express.json());
+
 app.use(cors({
-   origin: [
-    "https://shopsmart-frontend.vercel.app",
+  origin:[
+    "http://localhost:5173",
+    "http://localhost:5174",
     "https://shopsmart-admin-woad.vercel.app",
-     "http://localhost:5173",
-       "http://localhost:5174"
   ],
-  credentials: true
+  credentials:true,
 }));
 
+/* MONGODB */
+mongoose.set("strictQuery",false);
+
 mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log("MongoDB connected"))
-  .catch((err) => console.error("MongoDB connection error:", err));
-
-
-app.get("/", (req, res) => {
-  res.send("Express App is running");
+.then(()=>console.log("✅ MongoDB Connected"))
+.catch((err)=>{
+  console.log("❌ MongoDB Error");
+  console.log(err);
 });
 
-const storage = multer.diskStorage({
-  destination: "./upload/images",
-  filename: (req, file, cb) => {
-    return cb(
-      null,
-      `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`
-    );
-  },
+/* HOME */
+app.get("/",(req,res)=>{
+  res.send("🚀 ShopSmart Backend Running");
 });
 
-const upload = multer({ storage: storage });
-
-app.use('/images', express.static('upload/images'));
-app.post("/upload", upload.single("product"), (req, res) => {
-  res.json({
-    success: 1,
-    image_url: `http://localhost:${port}/images/${req.file.filename}`,
-  });
+/* CLOUDINARY */
+cloudinary.config({
+  cloud_name:process.env.CLOUDINARY_CLOUD_NAME,
+  api_key:process.env.CLOUDINARY_API_KEY,
+  api_secret:process.env.CLOUDINARY_API_SECRET,
 });
 
-const Product = mongoose.model("Product", {
-  id: {
-    type: Number,
-    required: true,
-  },
-  name: {
-    type: String,
-    required: true,
-  },
-  image: {
-    type: String,
-    required: true,
-  },
-  category: {
-    type: String,
-    required: true,
-  },
-  new_price: {
-    type: Number,
-    required: true,
-  },
-  old_price: {
-    type: Number,
-    required: true,
-  },
-  date: {
-    type: Date,
-    default: Date.now,
-  },
-  available: {
-    type: Boolean,
-    default: true,
+/* MULTER STORAGE */
+const storage=new CloudinaryStorage({
+  cloudinary,
+  params:{
+    folder:"shopsmart_products",
+    allowed_formats:["jpg","jpeg","png","webp"],
   },
 });
 
-app.post("/addproduct", async (req, res) => {
-  let products = await Product.find({});
-  let id;
-  if (products.length > 0) {
-    let last_product_array = products.slice(-1);
-    let last_product = last_product_array[0];
-    id = last_product.id + 1;
-  } else {
-    id = 1;
+const upload=multer({storage});
+
+/* IMAGE UPLOAD */
+app.post("/upload",upload.single("product"),async(req,res)=>{
+
+  try{
+
+    res.json({
+      success:true,
+      image_url:req.file.path,
+    });
+
   }
+  catch(error){
 
-  const product = new Product({
-    id: id,
-    name: req.body.name,
-    image: req.body.image,
-    category: req.body.category,
-    new_price: req.body.new_price,
-    old_price: req.body.old_price,
-  });
-  console.log(product);
-  await product.save();
-  console.log("Saved");
-  res.json({
-    success: true,
-    name: req.body.name,
-  });
-});
+    console.log(error);
 
-app.post("/removeproduct", async (req, res) => {
-  await Product.findOneAndDelete({ id: req.body.id });
-  console.log("Removed");
-  res.json({
-    success: true,
-    name: req.body.name,
-  });
-});
-
-app.get("/allproducts", async (req, res) => {
-  let products = await Product.find({});
-  console.log("All products Fetched");
-  res.send(products);
-});
-
-const User = mongoose.model("User", {
-  name: {
-    type: String,
-  },
-  email: {
-    type: String,
-    unique: true,
-  },
-  password: {
-    type: String,
-  },
-  cartData: {
-    type: Object,
-  },
-  date: {
-    type: Date,
-    default: Date.now,
-  },
-});
-
-app.post("/signup", async (req, res) => {
-  let check = await User.findOne({ email: req.body.email });
-  if (check) {
-    return res.status(400).json({
-      success: false,
-      errors: "Existing user found with same email address",
+    res.status(500).json({
+      success:false,
+      message:"Image Upload Failed",
     });
   }
-
-  let cart = {};
-  for (let i = 0; i < 300; i++) {
-    cart[i] = 0;
-  }
-
-  const user = new User({
-    name: req.body.username,
-    email: req.body.email,
-    password: req.body.password,
-    cartData: cart,
-  });
-  await user.save();
-
-  const data = {
-    user: {
-      id: user.id,
-    },
-  };
-  const token = jwt.sign(data, "secret_ecom");
-  res.json({ success: true, token });
 });
 
-app.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+/* PRODUCT MODEL */
+const Product=mongoose.model("Product",{
+  id:{
+    type:Number,
+    required:true,
+  },
 
-  try {
-    const user = await User.findOne({ email });
+  name:{
+    type:String,
+    required:true,
+  },
 
-    if (!user) {
-      return res
-        .status(401)
-        .json({ success: false, errors: "Wrong Email address" });
+  image:{
+    type:String,
+    required:true,
+  },
+
+  category:{
+    type:String,
+    required:true,
+  },
+
+  new_price:{
+    type:Number,
+    required:true,
+  },
+
+  old_price:{
+    type:Number,
+    required:true,
+  },
+
+  available:{
+    type:Boolean,
+    default:true,
+  },
+
+  date:{
+    type:Date,
+    default:Date.now,
+  },
+});
+
+/* USER MODEL */
+const User=mongoose.model("User",{
+
+  name:{
+    type:String,
+  },
+
+  email:{
+    type:String,
+    unique:true,
+  },
+
+  password:{
+    type:String,
+  },
+
+  cartData:{
+    type:Object,
+  },
+
+  date:{
+    type:Date,
+    default:Date.now,
+  },
+});
+
+/* ADD PRODUCT */
+app.post("/addproduct",async(req,res)=>{
+
+  try{
+
+    const products=await Product.find({});
+
+    let id;
+
+    if(products.length>0){
+
+      let last_product=products[products.length-1];
+
+      id=last_product.id+1;
+
+    }
+    else{
+
+      id=1;
     }
 
-    const passMatch = password === user.password;
+    const product=new Product({
 
-    if (!passMatch) {
-      return res.status(401).json({ success: false, errors: "Wrong Password" });
+      id:id,
+
+      name:req.body.name,
+
+      image:req.body.image,
+
+      category:req.body.category,
+
+      new_price:req.body.new_price,
+
+      old_price:req.body.old_price,
+    });
+
+    await product.save();
+
+    res.json({
+      success:true,
+      message:"Product Added",
+    });
+
+  }
+  catch(error){
+
+    console.log(error);
+
+    res.status(500).json({
+      success:false,
+      message:"Add Product Failed",
+    });
+  }
+});
+
+/* REMOVE PRODUCT */
+app.post("/removeproduct",async(req,res)=>{
+
+  try{
+
+    await Product.findOneAndDelete({
+      id:req.body.id,
+    });
+
+    res.json({
+      success:true,
+      message:"Product Removed",
+    });
+
+  }
+  catch(error){
+
+    console.log(error);
+
+    res.status(500).json({
+      success:false,
+      message:"Remove Failed",
+    });
+  }
+});
+
+/* ALL PRODUCTS */
+app.get("/allproducts",async(req,res)=>{
+
+  try{
+
+    const products=await Product.find({});
+
+    res.json(products);
+
+  }
+  catch(error){
+
+    console.log(error);
+
+    res.status(500).json({
+      success:false,
+      message:"Fetch Failed",
+    });
+  }
+});
+
+/* NEW COLLECTIONS */
+app.get("/newcollections",async(req,res)=>{
+
+  try{
+
+    const products=await Product.find({});
+
+    const newcollection=products.slice(-8);
+
+    res.json(newcollection);
+
+  }
+  catch(error){
+
+    console.log(error);
+
+    res.status(500).json({
+      success:false,
+      message:"Fetch Failed",
+    });
+  }
+});
+
+/* POPULAR PRODUCTS */
+app.get("/popularproducts",async(req,res)=>{
+
+  try{
+
+    const products=await Product.find({
+      category:"dairy",
+    });
+
+    const popularproducts=products.slice(0,4);
+
+    res.json(popularproducts);
+
+  }
+  catch(error){
+
+    console.log(error);
+
+    res.status(500).json({
+      success:false,
+      message:"Fetch Failed",
+    });
+  }
+});
+
+/* SIGNUP */
+app.post("/signup",async(req,res)=>{
+
+  try{
+
+    const check=await User.findOne({
+      email:req.body.email,
+    });
+
+    if(check){
+
+      return res.status(400).json({
+        success:false,
+        errors:"User already exists",
+      });
     }
 
-    const data = {
-      user: {
-        id: user.id,
+    let cart={};
+
+    for(let i=0;i<300;i++){
+
+      cart[i]=0;
+    }
+
+    const hashedPassword=await bcrypt.hash(req.body.password,10);
+
+    const user=new User({
+
+      name:req.body.username,
+
+      email:req.body.email,
+
+      password:hashedPassword,
+
+      cartData:cart,
+    });
+
+    await user.save();
+
+    const data={
+      user:{
+        id:user.id,
       },
     };
 
-    const token = jwt.sign(data, "secret_ecom");
-    res.json({ success: true, token });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, errors: "Server Error" });
+    const token=jwt.sign(data,process.env.JWT_SECRET);
+
+    res.json({
+      success:true,
+      token,
+    });
+
+  }
+  catch(error){
+
+    console.log(error);
+
+    res.status(500).json({
+      success:false,
+      message:"Signup Failed",
+    });
   }
 });
 
-app.get("/newcollections", async (req, res) => {
-  let products = await Product.find({});
-  let newcollection = products.slice(1).slice(-8);
-  console.log("Newcollection Fetched");
-  res.send(newcollection);
+/* LOGIN */
+app.post("/login",async(req,res)=>{
+
+  try{
+
+    const user=await User.findOne({
+      email:req.body.email,
+    });
+
+    if(!user){
+
+      return res.status(401).json({
+        success:false,
+        errors:"Wrong Email",
+      });
+    }
+
+    const passCompare=await bcrypt.compare(
+      req.body.password,
+      user.password
+    );
+
+    if(!passCompare){
+
+      return res.status(401).json({
+        success:false,
+        errors:"Wrong Password",
+      });
+    }
+
+    const data={
+      user:{
+        id:user.id,
+      },
+    };
+
+    const token=jwt.sign(data,process.env.JWT_SECRET);
+
+    res.json({
+      success:true,
+      token,
+    });
+
+  }
+  catch(error){
+
+    console.log(error);
+
+    res.status(500).json({
+      success:false,
+      message:"Login Failed",
+    });
+  }
 });
 
-app.get("/popularproducts", async (req, res) => {
-  let products = await Product.find({ category: "dairy" });
-  let popularproducts = products.slice(0, 4);
-  console.log("Daily products Fetched");
-  res.send(popularproducts);
-});
+/* AUTH */
+const fetchUser=async(req,res,next)=>{
 
-const fetchUser = async (req, res, next) => {
-  const token = req.header("auth-token");
-  if (!token) {
-    return res
-      .status(401)
-      .send({ errors: "Please authenticate using valid login" });
+  const token=req.header("auth-token");
+
+  if(!token){
+
+    return res.status(401).json({
+      errors:"Please Login",
+    });
   }
 
-  try {
-    const data = jwt.verify(token, "secret_ecom");
-    req.user = data.user;
+  try{
+
+    const data=jwt.verify(token,process.env.JWT_SECRET);
+
+    req.user=data.user;
+
     next();
-  } catch (error) {
-    return res
-      .status(401)
-      .send({ errors: "please authenticate using a valid token" });
+
+  }
+  catch(error){
+
+    res.status(401).json({
+      errors:"Invalid Token",
+    });
   }
 };
 
-app.post("/addtocart", fetchUser, async (req, res) => {
-  const itemId = req.body.itemId;
-  try {
-    const user = await User.findById(req.user.id);
+/* ADD TO CART */
+app.post("/addtocart",fetchUser,async(req,res)=>{
 
-    if (!user.cartData) {
-      user.cartData = {};
-    }
+  try{
 
-    if (!user.cartData[itemId]) {
-      user.cartData[itemId] = 0;
-    }
-
-    user.cartData[itemId] += 1;
-
-    await User.findByIdAndUpdate(req.user.id, { cartData: user.cartData });
-
-    res.status(200).json({ success: true, message: "Added to cart" });
-  } catch (error) {
-    res.status(500).json({ success: false, message: "Internal Server Error" });
-  }
-});
-
-app.post("/removefromcart", fetchUser, async (req, res) => {
-  const itemId = req.body.itemId;
-  try {
-    const user = await User.findById(req.user.id);
-
-    if (user.cartData && user.cartData[itemId] > 0) {
-      user.cartData[itemId] -= 1;
-    }
-
-    await User.findByIdAndUpdate(req.user.id, { cartData: user.cartData });
-
-    res.status(200).json({ success: true, message: "Removed from cart" });
-  } catch (error) {
-    res.status(500).json({ success: false, message: "Internal Server Error" });
-  }
-});
-
-app.post("/getcart", fetchUser, async (req, res) => {
-  console.log("Get cart");
-  let userData = await User.findOne({ _id: req.user.id });
-  res.json(userData.cartData);
-});
-
-const Razorpay = require("razorpay");
-
-const razorpayInstance = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET,
-});
-
-app.post("/createOrder", async (req, res) => {
-  const { amount } = req.body;
-  try {
-    const options = {
-      amount: amount * 100,
-      currency: "INR",
-      receipt: "receipt_order_001",
-    };
-    const order = await razorpayInstance.orders.create(options);
-    res.json({
-     key: process.env.RAZORPAY_KEY_ID,
-     order,
+    const userData=await User.findOne({
+      _id:req.user.id,
     });
-  } catch (error) {
-    res.status(500).json({ error: "Something went wrong" });
+
+    userData.cartData[req.body.itemId]+=1;
+
+    await User.findByIdAndUpdate(req.user.id,{
+      cartData:userData.cartData,
+    });
+
+    res.json({
+      success:true,
+      message:"Added To Cart",
+    });
+
+  }
+  catch(error){
+
+    console.log(error);
+
+    res.status(500).json({
+      success:false,
+      message:"Cart Failed",
+    });
   }
 });
 
-app.listen(port, (error) => {
-  if (!error) {
-    console.log("Server is running on port" + port);
-  } else {
-    console.log("Error: " + error);
+/* REMOVE FROM CART */
+app.post("/removefromcart",fetchUser,async(req,res)=>{
+
+  try{
+
+    const userData=await User.findOne({
+      _id:req.user.id,
+    });
+
+    if(userData.cartData[req.body.itemId]>0){
+
+      userData.cartData[req.body.itemId]-=1;
+    }
+
+    await User.findByIdAndUpdate(req.user.id,{
+      cartData:userData.cartData,
+    });
+
+    res.json({
+      success:true,
+      message:"Removed From Cart",
+    });
+
+  }
+  catch(error){
+
+    console.log(error);
+
+    res.status(500).json({
+      success:false,
+      message:"Remove Failed",
+    });
+  }
+});
+
+/* GET CART */
+app.post("/getcart",fetchUser,async(req,res)=>{
+
+  try{
+
+    const userData=await User.findOne({
+      _id:req.user.id,
+    });
+
+    res.json(userData.cartData);
+
+  }
+  catch(error){
+
+    console.log(error);
+
+    res.status(500).json({
+      success:false,
+      message:"Cart Fetch Failed",
+    });
+  }
+});
+
+/* RAZORPAY */
+const razorpayInstance=new Razorpay({
+
+  key_id:process.env.RAZORPAY_KEY_ID,
+
+  key_secret:process.env.RAZORPAY_KEY_SECRET,
+});
+
+/* CREATE ORDER */
+app.post("/createOrder",async(req,res)=>{
+
+  try{
+
+    const options={
+
+      amount:req.body.amount*100,
+
+      currency:"INR",
+
+      receipt:`receipt_${Date.now()}`,
+    };
+
+    const order=await razorpayInstance.orders.create(options);
+
+    res.json({
+      success:true,
+      order,
+      key:process.env.RAZORPAY_KEY_ID,
+    });
+
+  }
+  catch(error){
+
+    console.log(error);
+
+    res.status(500).json({
+      success:false,
+      message:"Payment Failed",
+    });
+  }
+});
+
+/* SERVER */
+app.listen(port,(error)=>{
+
+  if(!error){
+
+    console.log(`🚀 Server Running On Port ${port}`);
+  }
+  else{
+
+    console.log(error);
   }
 });

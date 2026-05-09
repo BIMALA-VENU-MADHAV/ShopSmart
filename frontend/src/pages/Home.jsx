@@ -1,21 +1,19 @@
 import Hero from "../components/Hero";
+import Popular from "../components/Popular";
+import Offer from "../components/Offer";
 import NewCollections from "../components/NewCollections";
 import NewsLetter from "../components/NewsLetter";
-import Offer from "../components/Offer";
-import Popular from "../components/Popular";
-
 
 const Home = () => {
   return (
     <>
-    <Hero />
-    <Popular />
-    <Offer />
-    <NewCollections />
-    <NewsLetter />
-
+      <Hero />
+      <Popular />
+      <Offer />
+      <NewCollections />
+      <NewsLetter />
     </>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;

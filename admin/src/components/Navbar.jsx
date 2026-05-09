@@ -1,24 +1,62 @@
-import profileImg from '../assets/profile.png';
+import profileImg from "../assets/profile.png";
+
 import { Link } from "react-router-dom";
 
 const Navbar = () => {
+
   return (
-    <nav className="flex items-center justify-between bg-white py-2 px-4 ring-1 ring-slate-900/5">
-      {/* Logo */}
-       <div>
-           <Link className="font-bold text-[22px] text-secondary ">ShopSmart</Link>
+
+    <header className="fixed top-0 left-0 w-full z-50 bg-white border-b border-slate-200 shadow-sm">
+
+      <nav className="max-w-[1600px] mx-auto h-20 px-4 sm:px-8 flex items-center justify-between">
+
+        {/* LOGO */}
+        <Link
+          to="/"
+          className="text-[24px] sm:text-[28px] font-bold text-secondary tracking-wide"
+        >
+
+          ShopSmart
+
+        </Link>
+
+        {/* TITLE */}
+        <div className="hidden sm:flex items-center gap-3 bg-secondary text-white px-5 py-2 rounded-full shadow-md">
+
+          <span className="uppercase font-semibold tracking-[2px] text-sm lg:text-base">
+
+            Admin Panel
+
+          </span>
+
+        </div>
+
+        {/* PROFILE */}
+        <div className="flex items-center gap-3">
+
+          <div className="hidden md:flex flex-col items-end">
+
+            <span className="text-sm font-semibold text-tertiary">
+              Admin
+            </span>
+
+            <span className="text-xs text-gray-500">
+              Shop Manager
+            </span>
+
           </div>
 
-      {/* Title */}
-      <div className="uppercase font-bold text-white bg-secondary px-4 py-2 rounded-md tracking-widest text-[20px]">
-        Admin Panel
-      </div>
+          <img
+            src={profileImg}
+            alt="Profile"
+            className="w-12 h-12 rounded-full object-cover border-2 border-secondary shadow-md"
+          />
 
-      {/* Profile Image */}
-      <div>
-        <img src={profileImg} alt="Profile" className="h-12 w-12 rounded-full" />
-      </div>
-    </nav>
+        </div>
+
+      </nav>
+
+    </header>
   );
 };
 

@@ -1,80 +1,174 @@
 import { useRef, useEffect, useState, useContext } from "react";
 import { Link, NavLink } from "react-router-dom";
-import logout from "../assets/logout.svg"
-import user from "../assets/user.svg"
-import Navbar from "./Navbar";
 import { FaOpencart } from "react-icons/fa";
+import { HiOutlineMenuAlt3 } from "react-icons/hi";
 import { ShopContext } from "../Context/ShopContext";
+import logout from "../assets/logout.svg";
+import user from "../assets/user.svg";
+import Navbar from "./Navbar";
 
 const Header = () => {
-    const [menuOpened, setmenuOpened] = useState(false);
-    const menuRef = useRef(null);
-    const {getTotalCartItems} = useContext(ShopContext);
 
- useEffect(() => {
-  const handleClickOutside = (event) => {
-   if (menuRef.current && !menuRef.current.contains(event.target)) {
-    setmenuOpened(false);
-   }
-  };
+  const [menuOpened, setmenuOpened] = useState(false);
 
-  if (menuOpened) {
-   document.addEventListener("mousedown", handleClickOutside);
-  }
+  const menuRef = useRef(null);
 
-  return () => {
-   document.removeEventListener("mousedown", handleClickOutside);
-  };
- }, [menuOpened]);
+  const { getTotalCartItems } = useContext(ShopContext);
 
- return (
-  <header className="fixed top-0 left-0 m-auto max_padd_container w-full bg-white ring-1 ring-slate-900/5 z-10">
-   <div className="px-4 flexBetween py-3 max-xs:px-2">
-    {/* logo */}
-    <div>
-     <Link className="text-secondary bold-22 ">ShopSmart</Link>
-    </div>
+  useEffect(() => {
 
-    {/* Navbar desktop */}
-    <Navbar containerStyles={"hidden md:flex gap-x-5 xl:gap-x-10 medium-15"} />
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setmenuOpened(false);
+      }
+    };
 
-    {/* Navbar mobile with ref */}
-    <div ref={menuRef}>
-     <Navbar
-      containerStyles={`${
-       menuOpened
-        ? "flex items-start flex-col gap-y-12 fixed top-20 right-8 p-12 bg-white rounded-3xl shadow-md w-64 ring-1 ring-slate-900/5 transition-all duration-300 z-50"
-        : "hidden"
-      } md:hidden`}
-     />
-    </div>
+    if (menuOpened) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
 
-    {/* buttons */}
-    <div className="flex items-center gap-x-3 bold-16">
-     <button
-      onClick={() => setmenuOpened(!menuOpened)}
-      className="md:hidden cursor-pointer rounded-full p-1 hover:text-secondary ring-1 ring-slate-900/30 h-8 w-8 hover:ring-secondary transition-colors"
-     >
-      ☰
-     </button>
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
 
-     <div className="flexBetween sm:gap-x-6">
-      <NavLink to="/cart-page" className="flex">
-       <FaOpencart className="p-1 h-8 w-8 ring-slate-900/30 ring-1 rounded-full" />
-       <span className="relative flexCenter w-5 h-5 rounded-full bg-secondary text-white medium-14 -top-2">{getTotalCartItems()}</span>
-      </NavLink>
+  }, [menuOpened]);
 
-      {/* Login/Logout Buttons */}
-      {localStorage.getItem('auth-token') ? <NavLink onClick={() => {localStorage.removeItem('auth-token'); window.location.replace("/")}} to={'logout'} className={"btn_secondary_rounded flexCenter gap-x-2 medium-16"}><img src={logout} alt="logutIcon" height={19} width={19}/>Logout</NavLink> :
-      <NavLink to={'login'} className={"btn_secondary_rounded flexCenter gap-x-2 medium-16"}>
-       <img src={user} alt="userIcon" height={19} width={19} />Login
-      </NavLink> }
-      
-     </div>
-    </div>
-   </div>
-  </header>
- );
+  return (
+    <header className="fixed top-0 left-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
+
+      <div className="max_padd_container">
+
+        <div className="flexBetween h-20">
+
+          {/* LOGO */}
+          <Link
+            to="/"
+            className="bold-28 text-secondary tracking-tight"
+          >
+            ShopSmart
+          </Link>
+
+          {/* DESKTOP NAV */}
+          <Navbar
+            containerStyles="hidden md:flex items-center gap-x-8 medium-15"
+          />
+
+          {/* RIGHT SIDE */}
+          <div className="flex items-center gap-x-4">
+
+            {/* CART */}
+            <NavLink
+              to="/cart"
+              className="relative flexCenter w-11 h-11 rounded-full border border-slate-200 bg-white hover:border-secondary hover:text-secondary transition-all duration-300"
+            >
+              <FaOpencart className="text-2xl" />
+
+              <span className="absolute -top-1 -right-1 flexCenter w-5 h-5 rounded-full bg-secondary text-white text-[11px] font-bold">
+                {getTotalCartItems()}
+              </span>
+            </NavLink>
+
+            {/* LOGIN / LOGOUT */}
+            {localStorage.getItem("auth-token") ? (
+
+              <NavLink
+                onClick={() => {
+                  localStorage.removeItem("auth-token");
+                  window.location.replace("/");
+                }}
+                to="/"
+                className="hidden sm:flex items-center gap-x-2 btn_secondary_rounded"
+              >
+                <img
+                  src={logout}
+                  alt="logoutIcon"
+                  className="w-4 h-4"
+                />
+                Logout
+              </NavLink>
+
+            ) : (
+
+              <NavLink
+                to="/login"
+                className="hidden sm:flex items-center gap-x-2 btn_secondary_rounded"
+              >
+                <img
+                  src={user}
+                  alt="userIcon"
+                  className="w-4 h-4"
+                />
+                Login
+              </NavLink>
+
+            )}
+
+            {/* MOBILE MENU BUTTON */}
+            <button
+              onClick={() => setmenuOpened(!menuOpened)}
+              className="md:hidden flexCenter w-11 h-11 rounded-full border border-slate-200 bg-white hover:border-secondary transition-all duration-300"
+            >
+              <HiOutlineMenuAlt3 className="text-2xl text-gray-700" />
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      {/* MOBILE MENU */}
+      <div ref={menuRef}>
+
+        <div
+          className={`${
+            menuOpened ? "flex" : "hidden"
+          } md:hidden absolute top-24 right-4 flex-col gap-y-6 bg-white shadow-2xl rounded-3xl p-8 min-w-[240px] border border-slate-100`}
+        >
+
+          <Navbar
+            containerStyles="flex flex-col gap-y-6 medium-15"
+          />
+
+          {localStorage.getItem("auth-token") ? (
+
+            <button
+              onClick={() => {
+                localStorage.removeItem("auth-token");
+                window.location.replace("/");
+              }}
+              className="flexCenter gap-x-2 btn_secondary_rounded"
+            >
+              <img
+                src={logout}
+                alt="logoutIcon"
+                className="w-4 h-4"
+              />
+              Logout
+            </button>
+
+          ) : (
+
+            <NavLink
+              to="/login"
+              className="flexCenter gap-x-2 btn_secondary_rounded"
+            >
+              <img
+                src={user}
+                alt="userIcon"
+                className="w-4 h-4"
+              />
+              Login
+            </NavLink>
+
+          )}
+
+        </div>
+
+      </div>
+
+    </header>
+  );
 };
 
 export default Header;

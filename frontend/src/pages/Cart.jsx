@@ -1,12 +1,15 @@
-import React from 'react'
-import CtItems from '../components/CtItems'
+import CtItems from "../components/CtItems";
 
 const Cart = () => {
-  return (
-    <div>
-      <CtItems />
-    </div>
-  )
-}
 
-export default Cart
+  return (
+
+    <section className="bg-primary min-h-screen">
+
+      <CtItems />
+
+    </section>
+  );
+};
+
+export default Cart;
