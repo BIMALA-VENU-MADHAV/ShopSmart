@@ -1,36 +1,31 @@
-import { useState } from "react";
+import {useState} from "react";
+import {FaEnvelope,FaLock,FaUser} from "react-icons/fa";
 
-import {
-  FaEnvelope,
-  FaLock,
-  FaUser,
-} from "react-icons/fa";
+const Login=()=>{
 
-const Login = () => {
+  const [state,setState]=useState("Login");
 
-  const [state, setState] = useState("Login");
+  const [loading,setLoading]=useState(false);
 
-  const [loading, setLoading] = useState(false);
-
-  const [formData, setFormData] = useState({
-    username: "",
-    password: "",
-    email: "",
+  const [formData,setFormData]=useState({
+    username:"",
+    password:"",
+    email:"",
   });
 
   /* INPUT CHANGE */
-  const changeHandler = (e) => {
+  const changeHandler=(e)=>{
 
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [e.target.name]:e.target.value,
     });
   };
 
   /* LOGIN */
-  const login = async () => {
+  const login=async()=>{
 
-    try {
+    try{
 
       setLoading(true);
 
@@ -39,20 +34,20 @@ const Login = () => {
       await fetch(
         `${import.meta.env.VITE_API_URL}/login`,
         {
-          method: "POST",
+          method:"POST",
 
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
+          headers:{
+            Accept:"application/json",
+            "Content-Type":"application/json",
           },
 
-          body: JSON.stringify(formData),
+          body:JSON.stringify(formData),
         }
       )
-        .then((response) => response.json())
-        .then((data) => (responseData = data));
+      .then((response)=>response.json())
+      .then((data)=>(responseData=data));
 
-      if (responseData.success) {
+      if(responseData.success){
 
         localStorage.setItem(
           "auth-token",
@@ -61,27 +56,30 @@ const Login = () => {
 
         window.location.replace("/");
 
-      } else {
+      }
+      else{
 
         alert(responseData.errors);
       }
 
-    } catch (error) {
+    }
+    catch(error){
 
       console.log(error);
 
       alert("Login Failed");
 
-    } finally {
+    }
+    finally{
 
       setLoading(false);
     }
   };
 
   /* SIGNUP */
-  const signup = async () => {
+  const signup=async()=>{
 
-    try {
+    try{
 
       setLoading(true);
 
@@ -90,20 +88,20 @@ const Login = () => {
       await fetch(
         `${import.meta.env.VITE_API_URL}/signup`,
         {
-          method: "POST",
+          method:"POST",
 
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
+          headers:{
+            Accept:"application/json",
+            "Content-Type":"application/json",
           },
 
-          body: JSON.stringify(formData),
+          body:JSON.stringify(formData),
         }
       )
-        .then((response) => response.json())
-        .then((data) => (responseData = data));
+      .then((response)=>response.json())
+      .then((data)=>(responseData=data));
 
-      if (responseData.success) {
+      if(responseData.success){
 
         localStorage.setItem(
           "auth-token",
@@ -112,25 +110,27 @@ const Login = () => {
 
         window.location.replace("/");
 
-      } else {
+      }
+      else{
 
         alert(responseData.errors);
       }
 
-    } catch (error) {
+    }
+    catch(error){
 
       console.log(error);
 
       alert("Signup Failed");
 
-    } finally {
+    }
+    finally{
 
       setLoading(false);
     }
   };
 
-  return (
-
+  return(
     <section className="min-h-screen flexCenter bg-primary px-4 pt-24 pb-16">
 
       <div className="w-full max-w-[480px] bg-white rounded-[32px] shadow-2xl overflow-hidden">
@@ -154,7 +154,7 @@ const Login = () => {
           <div className="flex flex-col gap-5">
 
             {/* USERNAME */}
-            {state === "Sign Up" && (
+            {state==="Sign Up" && (
 
               <div className="flex items-center bg-primary rounded-2xl px-5 h-14 border border-transparent focus-within:border-secondary transition-all duration-300">
 
@@ -215,18 +215,17 @@ const Login = () => {
             />
 
             <p className="text-sm text-gray-500 leading-6">
-              By continuing, I agree to the terms of use
-              and privacy policy.
+              By continuing, I agree to the terms of use and privacy policy.
             </p>
 
           </div>
 
           {/* BUTTON */}
           <button
-            onClick={() =>
-              state === "Login"
-                ? login()
-                : signup()
+            onClick={()=>
+              state==="Login"
+              ? login()
+              : signup()
             }
             disabled={loading}
             className="w-full bg-secondary hover:bg-[#ff6b1c] text-white font-semibold py-4 rounded-2xl mt-8 transition-all duration-300 shadow-lg hover:shadow-xl"
@@ -234,7 +233,7 @@ const Login = () => {
 
             {loading
               ? "Please Wait..."
-              : state === "Login"
+              : state==="Login"
               ? "Login"
               : "Create Account"}
 
@@ -243,14 +242,14 @@ const Login = () => {
           {/* TOGGLE */}
           <div className="text-center mt-8">
 
-            {state === "Sign Up" ? (
+            {state==="Sign Up" ? (
 
               <p className="text-gray-500">
 
                 Already have an account?{" "}
 
                 <span
-                  onClick={() => setState("Login")}
+                  onClick={()=>setState("Login")}
                   className="text-secondary font-semibold cursor-pointer hover:underline"
                 >
 
@@ -267,9 +266,7 @@ const Login = () => {
                 Don’t have an account?{" "}
 
                 <span
-                  onClick={() =>
-                    setState("Sign Up")
-                  }
+                  onClick={()=>setState("Sign Up")}
                   className="text-secondary font-semibold cursor-pointer hover:underline"
                 >
 
@@ -279,6 +276,22 @@ const Login = () => {
 
               </p>
             )}
+
+            {/* ADMIN LOGIN */}
+            <div className="mt-5">
+
+              <a
+                href="https://shopsmart-admin-woad.vercel.app/"
+                target="_blank"
+                rel="noreferrer"
+                className="text-sm text-tertiary font-semibold hover:text-secondary transition-all duration-300"
+              >
+
+                Admin Login →
+
+              </a>
+
+            </div>
 
           </div>
 
