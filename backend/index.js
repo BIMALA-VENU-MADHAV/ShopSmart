@@ -13,6 +13,7 @@ const {CloudinaryStorage}=require("multer-storage-cloudinary");
 const app=express();
 const port=process.env.PORT || 4000;
 
+
 /* MIDDLEWARE */
 app.use(express.json());
 
@@ -20,7 +21,8 @@ app.use(cors({
   origin:[
     "http://localhost:5173",
     "http://localhost:5174",
-    "https://shopsmart-admin-woad.vercel.app",
+    "https://shopsmart-frontend.vercel.app",
+    "https://shopsmart-admin-woad.vercel.app"
   ],
   credentials:true,
 }));
