@@ -1,10 +1,16 @@
 import profileImg from "../assets/profile.png";
-
 import { Link } from "react-router-dom";
 
-const Navbar = () => {
+const Navbar=()=>{
 
-  return (
+  const logout=()=>{
+
+    localStorage.removeItem("admin-auth");
+
+    window.location.replace("/");
+  };
+
+  return(
 
     <header className="fixed top-0 left-0 w-full z-50 bg-white border-b border-slate-200 shadow-sm">
 
@@ -12,27 +18,30 @@ const Navbar = () => {
 
         {/* LOGO */}
         <Link
-          to="/"
+          to="/addproduct"
           className="text-[24px] sm:text-[28px] font-bold text-secondary tracking-wide"
         >
-
           ShopSmart
-
         </Link>
 
         {/* TITLE */}
         <div className="hidden sm:flex items-center gap-3 bg-secondary text-white px-5 py-2 rounded-full shadow-md">
 
           <span className="uppercase font-semibold tracking-[2px] text-sm lg:text-base">
-
             Admin Panel
-
           </span>
 
         </div>
 
-        {/* PROFILE */}
-        <div className="flex items-center gap-3">
+        {/* RIGHT */}
+        <div className="flex items-center gap-4">
+
+          <button
+            onClick={logout}
+            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300"
+          >
+            Logout
+          </button>
 
           <div className="hidden md:flex flex-col items-end">
 

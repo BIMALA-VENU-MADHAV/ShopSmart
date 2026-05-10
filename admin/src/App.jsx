@@ -1,20 +1,43 @@
+import {Routes,Route,Navigate} from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Admin from "./pages/Admin";
+import AdminLogin from "./pages/AdminLogin";
 
-export default function App() {
+export default function App(){
 
-  return (
+  const isAdmin=localStorage.getItem("admin-auth");
 
+  return(
     <main className="bg-primary text-tertiary min-h-screen">
 
-      <Navbar />
+      {isAdmin && <Navbar />}
 
-      <div className="pt-20">
+      <div className={isAdmin ? "pt-20" : ""}>
 
-        <Admin />
+        <Routes>
+
+          <Route
+            path="/"
+            element={
+              isAdmin
+              ? <Navigate to="/addproduct" />
+              : <AdminLogin />
+            }
+          />
+
+          <Route
+            path="/*"
+            element={
+              isAdmin
+              ? <Admin />
+              : <Navigate to="/" />
+            }
+          />
+
+        </Routes>
 
       </div>
 
     </main>
-  );
+  )
 }
