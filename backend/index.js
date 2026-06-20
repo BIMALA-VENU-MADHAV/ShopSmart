@@ -23,7 +23,7 @@ app.use(cors({
     "http://localhost:5174",
     "https://shopsmart-frontend.vercel.app",
     "https://shopsmart-admin-woad.vercel.app",
-    "https://shopsmart-online.vercel.app/"
+    "https://shopsmart-online.vercel.app"
   ],
   credentials:true,
 }));
